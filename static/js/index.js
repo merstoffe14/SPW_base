@@ -2,13 +2,13 @@ async function main() {
     setInterval(async () => {
         console.log("loop example"); 
     }, 5000);
-
+    example();  
 }
 
 async function example() {
     console.log("example!");
     let result = await fetch("/api/example");
-    document.getElementById("example_header").innerText = await result.text();
+    document.getElementById("example_header").innerHTML = await result.text();
 }
 
 async function sendCommand(command) {
