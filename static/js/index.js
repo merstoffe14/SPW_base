@@ -13,7 +13,7 @@ async function example() {
 
 async function sendCommand(command) {
     await fetch(`/api/sendcommand?command=${command}`)
-    getpos()
+    
 }
 
 async function goTo() {
