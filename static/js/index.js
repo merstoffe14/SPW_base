@@ -16,6 +16,7 @@ async function sendCommand(command) {
     
 }
 
+// Example function to send a goto command to the server
 async function goTo() {
 
     x = document.getElementById("x_input").value;

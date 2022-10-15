@@ -3,28 +3,20 @@ import time
 from sys import platform
 import serial.tools.list_ports as port_list
 
-
-#I'm not yet sure about this piece of code, 
-# I can send an receive data over serial, 
-# but I have not tested if I properly receive everything.
-#Sending works great and has been tested.
 class SerialBridge:
 
     async def open_bridge(self):
 
         # Open grbl serial port        
         if platform == "linux" or platform == "linux2":
-            #Not tested yet, and it asumes that the port is the first one in the list
-            all_ports = list(port_list.comports())
-            port = all_ports[0].device
-            ard = serial.Serial(port, 115200, timeout=0.1,write_timeout=0.1, inter_byte_timeout=0.1)
-            self.s = ard
+            self.s = self.connect_to_ports_linux()
 
         elif platform == "darwin":  ##OS X
             raise Exception( "Not Mac compatible yet" )
             
         elif platform == "win32":
             self.s = self.connect_to_ports()
+            
         if self.s is None:   return
 
         # Wake up grbl
@@ -38,7 +30,7 @@ class SerialBridge:
         for line in f:
             await self.send_command(line)
 
-    async def send_command(self, command):
+    async def send_command(self, command) -> bytes:
 
         if self.s is None: return
 
@@ -63,7 +55,7 @@ class SerialBridge:
         await self.send_command(command)
 
     
-    def connect_to_ports(self):
+    def connect_to_ports(self) -> serial.Serial:
 
         #####        
         ard=None
@@ -80,7 +72,16 @@ class SerialBridge:
                 continue
         return ard
 
-
+    def connect_to_ports_linux(self) -> serial.Serial:
+        #Not tested yet, and it asumes that the port is the first one in the list
+        all_ports = list(port_list.comports())
+        port = all_ports[0].device
+        try:
+            ard = serial.Serial(port, 115200, timeout=0.1, write_timeout=0.1, inter_byte_timeout=0.1)
+        except:
+            print("Linux: port connection failed")
+            return None
+        return ard
 
 
 

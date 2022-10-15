@@ -27,7 +27,7 @@ async def app_startup():
     # thread_threadname = threading.Thread(target=class.run_main)
     # thread_threadname.start()  
 
-    # await bridge._send_command_agr("$H")
+    # await bridge.send_command("$H")
 
 
 
