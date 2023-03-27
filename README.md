@@ -15,8 +15,8 @@ Currently everything in template is designed for communicating with [**GRBL**](h
 graph LR
 A[Microcontroller ]
 B((Server))
-A == PySerial bridge --> B
-B == PySerial bridge --> A
+A -- PySerial bridge --> B
+B -- PySerial bridge --> A
 C[Web interface]
 C -- FastAPI calls --> B
 B -- FastAPI calls --> C
