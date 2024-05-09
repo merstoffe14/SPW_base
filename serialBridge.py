@@ -5,6 +5,10 @@ import serial.tools.list_ports as port_list
 
 class SerialBridge:
 
+    def __init__(self, baudrate=115200):
+        self.baudrate = baudrate
+        self.status = "Bridge not open"
+
     async def open_bridge(self):
 
         # Open grbl serial port        
@@ -23,12 +27,7 @@ class SerialBridge:
         self.s.write(b"\r\n\r\n")
         time.sleep(2)   # Wait for grbl to initialize
         self.s.flushInput()  # Flush startup text in serial input
-
-    async def stream_g_code_file(self, filename= 'grbl.code'):
-        # Stream g-code to grbl
-        f = open(filename, 'r')
-        for line in f:
-            await self.send_command(line)
+        self.status = "Bridge open"
 
     async def send_command(self, command) -> bytes:
 
@@ -44,29 +43,38 @@ class SerialBridge:
         print(grbl_out.strip())
         return grbl_out.strip()
 
-    async def goto(self, x: float, y: float, z: float, sys: int):
-        if sys == 1:
-            await self.send_command("G91")
-        if sys == 0:
-            await self.send_command("G90")
+    # GRBL SPECIFIC
+    # async def goto(self, x: float, y: float, z: float, sys: int):
+    #     if sys == 1:
+    #         await self.send_command("G91")
+    #     if sys == 0:
+    #         await self.send_command("G90")
               
-        command = "G0 x " + str(x) + " y " + str(y) + " z " + str(z)
+    #     command = "G0 x " + str(x) + " y " + str(y) + " z " + str(z)
         
-        await self.send_command(command)
+    #     await self.send_command(command)
+# GRBL SPECIFIC
+    #  async def stream_g_code_file(self, filename= 'grbl.code'):
+    #     # Stream g-code to grbl
+    #     f = open(filename, 'r')
+    #     for line in f:
+    #         await self.send_command(line)
 
     
+
     def connect_to_ports(self) -> serial.Serial:
 
         #####        
         ard=None
         all_ports = list(port_list.comports())
+        # If this does not find any ports, you may need to change the description to match your device.
         pos_ports = [p.device for p in all_ports  if "CH340" in p.description]
        
-        if len(pos_ports)==0:       print("No Port Found"); ## You may wish to cause an error here.   
+        if len(pos_ports)==0:       print("No Port Found")
         ## Search for Suitable Port
         for port in pos_ports: 
             try:      
-                ard = serial.Serial(port, 115200, timeout=0.1)
+                ard = serial.Serial(port, self.baudrate, timeout=0.1)
                 print("Connecting to port"+ port)
             except:   
                 continue
@@ -77,11 +85,14 @@ class SerialBridge:
         all_ports = list(port_list.comports())
         port = all_ports[0].device
         try:
-            ard = serial.Serial(port, 115200, timeout=0.1, write_timeout=0.1, inter_byte_timeout=0.1)
+            ard = serial.Serial(port, self.baudrate, timeout=0.1, write_timeout=0.1, inter_byte_timeout=0.1)
         except:
             print("Linux: port connection failed")
             return None
         return ard
+    
+    def get_status(self):
+        return self.status
 
 
 
