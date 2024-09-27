@@ -85,6 +85,7 @@ An example function that is useful for a gantry system
 
 ### index.js
 In the index.js file you will find some functions that all relate to functions and API calls mentioned above
+elo
 
 
 
